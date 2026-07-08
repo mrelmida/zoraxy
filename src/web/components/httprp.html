@@ -2289,6 +2289,7 @@
             // render it again
             resyncProxyEditorConfig();
             window.scrollTo(0, 0);
+            $(".contentWindow").scrollTop(0);
             $("body").css("overflow", "hidden");
         } else {
             listProxyEndpoints();

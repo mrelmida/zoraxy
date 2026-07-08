@@ -8,7 +8,8 @@
 */
 
 function _whiteThemeHandleApplyChange(){
-    $(".menubar .logo").attr("src", "img/logo.svg");
+    //The signal bar stays night-side in both themes, so the logo is always the white variant
+    $(".menubar .logo").attr("src", "img/logo_white.svg");
 }
 
 function _darkThemeHandleApplyChange(){
@@ -44,8 +45,9 @@ function _darkThemeHandleApplyChange(){
     }
 }
 
-if (localStorage.getItem("theme") == "dark"){
-    setDarkTheme(true);
-}else{
+//Dark theme is the default. Light theme only applies when explicitly chosen.
+if (localStorage.getItem("theme") == "light"){
     setDarkTheme(false);
+}else{
+    setDarkTheme(true);
 }

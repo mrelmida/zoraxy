@@ -21,9 +21,10 @@ import (
 
 func FSHandler(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Allow access to /script/*, /img/pubic/* and /login.html without authentication
+		// Allow access to /script/*, /img/pubic/*, /fonts/* and /login.html without authentication
 		if strings.HasPrefix(r.URL.Path, "/script/") ||
 			strings.HasPrefix(r.URL.Path, "/img/public/") ||
+			strings.HasPrefix(r.URL.Path, "/fonts/") ||
 			r.URL.Path == "/login.html" ||
 			r.URL.Path == "/reset.html" ||
 			r.URL.Path == "/favicon.png" {

@@ -48,7 +48,7 @@
             <div class="ui basic segment">
                 <div class="ui yellow message">
                     <i class="info circle icon"></i>
-                    The identity returned by the IdP (see <b>Username Claim</b>) must match an existing Zoraxy admin username. This does not configure SSO for proxied sites — use the Authentication Providers section for that.
+                    Add your IdP username or email to <b>Allowed identities</b> and anyone on that list can sign in as this panel's admin account. This does not configure SSO for proxied sites — use the Authentication Providers section for that.
                 </div>
                 <form class="ui form" id="adminOidcForm" onsubmit="return false;">
                     <div class="field">
@@ -82,10 +82,17 @@
                             <small>Userinfo claim matched against the local admin username. Falls back to <code>email</code>, then <code>sub</code>.</small>
                         </div>
                     </div>
-                    <div class="field">
-                        <label>Allowed Identities (optional)</label>
-                        <input type="text" id="adminOidcAllowedIdentities" placeholder="alice, bob@example.com">
-                        <small>Comma separated allowlist of claim values. Leave empty to allow any identity that matches a local admin account.</small>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Allowed Identities</label>
+                            <input type="text" id="adminOidcAllowedIdentities" placeholder="alice, bob@example.com">
+                            <small>Comma separated list of IdP usernames or emails that may sign in. They sign in as this panel's admin account. If left empty, an identity can only sign in when it exactly equals a Zoraxy account username.</small>
+                        </div>
+                        <div class="field">
+                            <label>Log in as (optional)</label>
+                            <input type="text" id="adminOidcMapToUser" placeholder="auto">
+                            <small>The Zoraxy account that allowed identities sign in as. Leave empty to use the only account on this panel (or one named exactly like the identity).</small>
+                        </div>
                     </div>
                     <div class="field">
                         <label>Redirect URL Override (optional)</label>
@@ -386,6 +393,7 @@
             $("#adminOidcScopes").val(data.Scopes || "openid profile email");
             $("#adminOidcUsernameClaim").val(data.UsernameClaim || "preferred_username");
             $("#adminOidcAllowedIdentities").val(data.AllowedIdentities || "");
+            $("#adminOidcMapToUser").val(data.MapToUser || "");
             $("#adminOidcRedirectURL").val(data.RedirectURL || "");
             $('#adminOidcForm .ui.checkbox').checkbox();
         });
@@ -403,6 +411,7 @@
                 scopes: $("#adminOidcScopes").val().trim(),
                 usernameClaim: $("#adminOidcUsernameClaim").val().trim(),
                 allowedIdentities: $("#adminOidcAllowedIdentities").val().trim(),
+                mapToUser: $("#adminOidcMapToUser").val().trim(),
                 redirectURL: $("#adminOidcRedirectURL").val().trim(),
             },
             success: function(data) {

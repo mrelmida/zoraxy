@@ -15,14 +15,14 @@
         <script src="script/countryCode.js"></script>
         <script src="script/chart.js"></script>
         <script src="script/utils.js"></script>
-        <link rel="stylesheet" href="main.css">
-        <link rel="stylesheet" href="darktheme.css">
+        <link rel="stylesheet" href="main.css?v=harbor1">
+        <link rel="stylesheet" href="darktheme.css?v=harbor1">
     </head>
     <body>
-        <script src="script/darktheme.js"></script>
+        <script src="script/darktheme.js?v=harbor1"></script>
         <div class="menubar">
             <div class="item">
-                <img class="logo" src="img/logo.svg">
+                <img class="logo" src="img/logo_white.svg">
             </div>
 
             <div class="ui right floated buttons menutoggle" style="padding-top: 2px;">
@@ -526,7 +526,7 @@
                         }
                     },100)
                 });
-                $('html,body').animate({scrollTop: 0}, 'fast');
+                $('html,body,.contentWindow').animate({scrollTop: 0}, 'fast');
 
                 if (tabID == "pluginContextWindow"){
                     let statePayload = {
@@ -553,6 +553,14 @@
             $(window).on("resize", function(){
                 if (window.innerWidth >= 750 && $(".toolbar").is(":visible") == false){
                     $(".toolbar").show();
+                }
+            });
+
+            //Mobile: tapping anywhere outside the open navigation drawer closes it
+            $(document).on("click", function(e){
+                if (window.innerWidth < 750 && $(".toolbar").is(":visible")
+                    && !$(e.target).closest(".toolbar, .menutoggle").length){
+                    $(".toolbar").fadeOut("fast");
                 }
             });
 

@@ -51,8 +51,9 @@ type Config struct {
 	ClientID          string
 	ClientSecret      string
 	Scopes            string //Space separated. Default "openid profile email"
-	UsernameClaim     string //Userinfo claim matched against local admin usernames. Default "preferred_username", falls back to "email" then "sub"
-	AllowedIdentities string //Optional comma separated allowlist of claim values. Empty = any claim value that matches a local user
+	UsernameClaim     string //Userinfo claim used as the identity. Default "preferred_username", falls back to "email" then "sub"
+	AllowedIdentities string //Comma separated allowlist of claim values that may sign in. Empty = only identities whose claim equals a local admin username
+	MapToUser         string //Local admin account that allowed identities sign in as. Empty = auto (the only account, or the account matching the claim)
 	RedirectURL       string //Optional explicit callback URL override, needed when the panel is accessed through an HTTPS reverse proxy
 }
 
@@ -295,19 +296,56 @@ func (o *AdminOIDCRouter) HandleCallback(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if !identityAllowed(identity, config.AllowedIdentities) {
-		failLogin("OIDC identity \""+identity+"\" is not in the allowed identities list", nil)
+	localUser, err := o.resolveLocalUser(identity, &config)
+	if err != nil {
+		failLogin("OIDC identity \""+identity+"\" rejected: "+err.Error(), nil)
 		return
 	}
 
-	if !o.options.AuthAgent.UserExists(identity) {
-		failLogin("OIDC identity \""+identity+"\" does not match any admin account", nil)
-		return
-	}
-
-	o.options.AuthAgent.LoginUserByRequest(w, r, identity, false)
-	o.options.Logger.PrintAndLog("admin-oidc", identity+" logged in via OIDC", nil)
+	o.options.AuthAgent.LoginUserByRequest(w, r, localUser, false)
+	o.options.Logger.PrintAndLog("admin-oidc", identity+" logged in via OIDC as "+localUser, nil)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// resolveLocalUser decides which local admin account an authenticated OIDC
+// identity signs in as.
+//
+// With an allowed-identities list, any listed identity may sign in; the local
+// account is MapToUser if set, otherwise the account named like the claim,
+// otherwise the only existing account. Without a list, the claim must equal
+// a local admin username.
+func (o *AdminOIDCRouter) resolveLocalUser(identity string, config *Config) (string, error) {
+	allowlisted := strings.TrimSpace(config.AllowedIdentities) != ""
+
+	if allowlisted {
+		if !identityAllowed(identity, config.AllowedIdentities) {
+			return "", errors.New("not in the allowed identities list")
+		}
+		//Explicit mapping wins
+		if config.MapToUser != "" {
+			if !o.options.AuthAgent.UserExists(config.MapToUser) {
+				return "", errors.New("mapped account \"" + config.MapToUser + "\" does not exist")
+			}
+			return config.MapToUser, nil
+		}
+		//Claim happens to match a local account
+		if o.options.AuthAgent.UserExists(identity) {
+			return identity, nil
+		}
+		//Single-admin instance: the allowlist entry is the authorization,
+		//sign in as the only account there is
+		localUsers := o.options.AuthAgent.ListUsers()
+		if len(localUsers) == 1 {
+			return localUsers[0], nil
+		}
+		return "", errors.New("multiple admin accounts exist, set \"Log in as\" to pick one")
+	}
+
+	//No allowlist: the claim itself must name a local admin account
+	if !o.options.AuthAgent.UserExists(identity) {
+		return "", errors.New("does not match any admin account username; add it to allowed identities or rename the account")
+	}
+	return identity, nil
 }
 
 func (o *AdminOIDCRouter) clearFlowCookies(w http.ResponseWriter, secure bool) {
@@ -414,6 +452,7 @@ func (o *AdminOIDCRouter) handleSettingsUpdate(w http.ResponseWriter, r *http.Re
 	scopes, _ := utils.PostPara(r, "scopes")
 	usernameClaim, _ := utils.PostPara(r, "usernameClaim")
 	allowedIdentities, _ := utils.PostPara(r, "allowedIdentities")
+	mapToUser, _ := utils.PostPara(r, "mapToUser")
 	redirectURL, _ := utils.PostPara(r, "redirectURL")
 
 	wellKnownURL = strings.TrimSpace(wellKnownURL)
@@ -443,6 +482,7 @@ func (o *AdminOIDCRouter) handleSettingsUpdate(w http.ResponseWriter, r *http.Re
 		Scopes:            strings.TrimSpace(scopes),
 		UsernameClaim:     strings.TrimSpace(usernameClaim),
 		AllowedIdentities: strings.TrimSpace(allowedIdentities),
+		MapToUser:         strings.TrimSpace(mapToUser),
 		RedirectURL:       strings.TrimSpace(redirectURL),
 	}
 

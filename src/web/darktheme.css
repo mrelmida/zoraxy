@@ -6,65 +6,155 @@
 */
 
 /* Color Pallete */
-/* Theme Color Definition */
+/* Theme Color Definition
+
+   "Harbor control" design system.
+   Light theme = chart paper (cool nautical-chart tint, ink text).
+   Dark theme  = harbor at night (blue-green water blacks, foam text).
+   Single accent = lantern amber (the beacon).
+   Status duo follows navigation-light convention:
+   starboard green = up / allowed, port red = down / blocked.
+*/
 body:not(.darkTheme){
-    --theme_bg: #fafafa;
-    --theme_bg_primary: #ffffff;
-    --theme_bg_secondary: #ffffff;
-    --theme_bg_active: #ececec;
-    --theme_highlight: #a9d1f3;
-    --theme_bg_inverted: #27292d;
-    --theme_advance: #f7f7f7;
-    --item_color: #5e5d5d;
-    --item_color_select: rgba(0,0,0,.87);
-    --text_color: #414141;
-    --text_color_secondary: #4b4b4b;
-    --input_color: white;
-    --divider_color: #e2e2de;
-    --text_color_inverted: #fcfcfc;
-    --button_text_color: #878787;
-    --button_border_color: #dedede;
-    --buttom_toggle_active: #01dc64;
-    --buttom_toggle_disabled: #f2f2f2;
-    --table_header_color: transparent;
+    --theme_bg: #F1F4EF;
+    --theme_bg_primary: #FBFCFA;
+    --theme_bg_secondary: #FBFCFA;
+    --theme_bg_active: #E4EAE3;
+    --theme_highlight: #D3DDD6;
+    --theme_bg_inverted: #17242E;
+    --theme_advance: #EAEFE9;
+    --item_color: #51636B;
+    --item_color_select: #14212B;
+    --text_color: #1C2B33;
+    --text_color_secondary: #51636B;
+    --input_color: #FFFFFF;
+    --divider_color: #D8E0DA;
+    --text_color_inverted: #F5F8F5;
+    --button_text_color: #3E5059;
+    --button_border_color: #C7D2CC;
+    --buttom_toggle_active: #2E9E5B;
+    --buttom_toggle_disabled: #E4EAE3;
+    --table_header_color: #EAEFE9;
     --table_header_text_color: var(--text_color);
     --table_bg_default: transparent;
-    --status_dot_bg: #e8e8e8;
+    --status_dot_bg: #D8E0DA;
 
-    --theme_background: linear-gradient(60deg, rgb(84, 58, 183) 0%, rgb(0, 172, 193) 100%);
-    --theme_background_inverted: linear-gradient(45deg, rgba(18,19,23,1) 21%, rgba(50,59,66,1) 79%);
-    --theme_green: linear-gradient(45deg, rgba(65,199,175,1) 21%, rgba(84,227,142,1) 79%);
-    --theme_red: linear-gradient(203deg, rgba(250,172,38,1) 17%, rgba(202,0,37,1) 78%);
+    /* Harbor design tokens */
+    --beacon: #B4711A;                    /* lantern amber, darkened for paper contrast */
+    --beacon_soft: rgba(180, 113, 26, 0.12);
+    --port: #C2453C;                      /* port red: down / blocked */
+    --starboard: #2E9E5B;                 /* starboard green: up / allowed */
+    --shell_bg: #17242E;                  /* signal bar + sidebar chrome stays night-side in both themes */
+    --shell_text: #D7E2E6;
+    --shell_muted: #7C919D;
+    --shell_border: #24374A;
+    --shell_active_bg: rgba(245, 168, 60, 0.10);
+
+    --theme_background: linear-gradient(150deg, #1C4A5E 0%, #12735F 100%);
+    --theme_background_inverted: linear-gradient(150deg, #10202B 0%, #17384A 100%);
+    --theme_green: linear-gradient(45deg, #2E9E5B 10%, #46C27A 90%);
+    --theme_red: linear-gradient(203deg, #F5A83C 10%, #C2453C 80%);
 }
 
 body.darkTheme{
-    --theme_bg: #121214;
-    --theme_bg_primary: #1a1a1e;
-    --theme_bg_secondary:#4a7bb8;
-    --theme_highlight: #5583ee;
-    --theme_bg_active: #202024;
-    --theme_bg_inverted: #f8f8f9;
-    --theme_advance: #1a1a1a;
-    --item_color: #b0b0b0;
-    --text_color: #fafafa;
-    --text_color_secondary: #94959c;
-    --input_color: black;
-    --divider_color: #3e3e42;
-    --item_color_select: rgba(255, 255, 255, 0.75);
-    --text_color_inverted: #414141;
-    --button_text_color: #cccccc;
-    --button_border_color: #555555;
-    --buttom_toggle_active: #00c853;
-    --buttom_toggle_disabled: #3a3a3a;
-    --table_header_color: #202024;
-    --table_header_text_color: var(--text_color);
-    --table_bg_default: #2a2a2d;
-    --status_dot_bg: #333333;
+    --theme_bg: #0A121A;
+    --theme_bg_primary: #101B26;
+    --theme_bg_secondary: #101B26;
+    --theme_highlight: #24374A;
+    --theme_bg_active: #16242F;
+    --theme_bg_inverted: #EDF3F5;
+    --theme_advance: #0D1720;
+    --item_color: #8FA3B0;
+    --text_color: #E8EEF2;
+    --text_color_secondary: #8FA3B0;
+    --input_color: #0C161E;
+    --divider_color: #1F2F3D;
+    --item_color_select: #F5F9FA;
+    --text_color_inverted: #14212B;
+    --button_text_color: #C5D2D8;
+    --button_border_color: #2A3E4E;
+    --buttom_toggle_active: #37B26C;
+    --buttom_toggle_disabled: #1B2936;
+    --table_header_color: #0D1720;
+    --table_header_text_color: #A9BCC6;
+    --table_bg_default: #0E1922;
+    --status_dot_bg: #1B2936;
 
-    --theme_background: linear-gradient(45deg, rgba(85,131,238,1) 21%, rgba(65,216,221,1) 79%);
-    --theme_background_inverted:linear-gradient(45deg, rgba(18,19,23,1) 21%, rgba(50,59,66,1) 79%);
-    --theme_green: linear-gradient(45deg, rgba(65,199,175,1) 21%, rgba(84,227,142,1) 79%);
-    --theme_red: linear-gradient(203deg, rgba(250,172,38,1) 17%, rgba(202,0,37,1) 78%);
+    /* Harbor design tokens */
+    --beacon: #F5A83C;                    /* lantern amber against night water */
+    --beacon_soft: rgba(245, 168, 60, 0.12);
+    --port: #E3574B;
+    --starboard: #37B26C;
+    --shell_bg: #0C161E;
+    --shell_text: #D7E2E6;
+    --shell_muted: #7C919D;
+    --shell_border: #1F2F3D;
+    --shell_active_bg: rgba(245, 168, 60, 0.10);
+
+    --theme_background: linear-gradient(150deg, #133247 0%, #0F5E52 100%);
+    --theme_background_inverted: linear-gradient(150deg, #0A121A 0%, #14242F 100%);
+    --theme_green: linear-gradient(45deg, #2E9E5B 10%, #46C27A 90%);
+    --theme_red: linear-gradient(203deg, #F5A83C 10%, #C2453C 80%);
+}
+
+/* Typography + shape tokens (theme independent) */
+:root{
+    --font_display: "Saira", "Segoe UI", system-ui, sans-serif;
+    --font_body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    --font_mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    --radius: 8px;
+    --radius_lg: 12px;
+}
+
+/* Self-hosted fonts (latin subsets) */
+@font-face{
+    font-family: "Saira";
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/saira-600.woff2") format("woff2");
+}
+@font-face{
+    font-family: "Saira";
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/saira-700.woff2") format("woff2");
+}
+@font-face{
+    font-family: "Instrument Sans";
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/instrument-sans-400.woff2") format("woff2");
+}
+@font-face{
+    font-family: "Instrument Sans";
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/instrument-sans-500.woff2") format("woff2");
+}
+@font-face{
+    font-family: "Instrument Sans";
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/instrument-sans-600.woff2") format("woff2");
+}
+@font-face{
+    font-family: "IBM Plex Mono";
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/ibm-plex-mono-400.woff2") format("woff2");
+}
+@font-face{
+    font-family: "IBM Plex Mono";
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    src: url("fonts/ibm-plex-mono-500.woff2") format("woff2");
 }
 
 /* General Rules Overwrite */
@@ -1226,4 +1316,316 @@ body.darkTheme .ui.horizontal.divider {
 body.darkTheme .ui.checkbox input:checked ~ .box::after,
 body.darkTheme .ui.checkbox input:checked ~ label::after {
     color: var(--text_color_inverted) !important;
+}
+
+/* ============================================================
+   HARBOR DESIGN SYSTEM
+   Component reskin applied to BOTH themes. Everything below
+   derives from the palette variables defined at the top of
+   this file. Loaded by every page and snippet editor.
+   ============================================================ */
+
+/* ---- Base typography ---- */
+body{
+    font-family: var(--font_body);
+    color: var(--text_color);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .ui.header,
+h1.ui.header, h2.ui.header, h3.ui.header{
+    font-family: var(--font_display);
+    letter-spacing: 0.01em;
+    font-weight: 600;
+}
+
+h4, h5, h6, h4.ui.header, h5.ui.header{
+    font-family: var(--font_body);
+    font-weight: 600;
+}
+
+p, span, label, .ui.form label, small{
+    font-family: var(--font_body);
+}
+
+/* Data is monospace: IPs, ports, hostnames, keys */
+code, pre, .mono,
+td code, .ui.table code{
+    font-family: var(--font_mono);
+    font-size: 0.92em;
+    background: var(--beacon_soft);
+    color: var(--text_color);
+    border-radius: 4px;
+    padding: 0.1em 0.35em;
+}
+
+/* ---- Links ---- */
+a{
+    color: var(--beacon);
+}
+a:hover{
+    color: var(--beacon);
+    filter: brightness(1.15);
+}
+
+/* ---- Segments / panels: hairline hull borders, crisp corners ---- */
+.ui.segment{
+    background: var(--theme_bg_primary);
+    border: 1px solid var(--divider_color);
+    border-radius: var(--radius);
+    box-shadow: none;
+}
+.ui.basic.segment{
+    border: none;
+    background: transparent;
+}
+
+/* ---- Buttons ---- */
+.ui.button{
+    font-family: var(--font_body);
+    font-weight: 600;
+    border-radius: var(--radius);
+}
+.ui.basic.button, .ui.basic.buttons .button{
+    color: var(--button_text_color) !important;
+    box-shadow: 0 0 0 1px var(--button_border_color) inset !important;
+    background: var(--theme_bg_primary) !important;
+}
+.ui.basic.button:hover, .ui.basic.buttons .button:hover{
+    color: var(--text_color) !important;
+    box-shadow: 0 0 0 1px var(--beacon) inset !important;
+    background: var(--beacon_soft) !important;
+}
+
+/* ---- Inputs ---- */
+.ui.input > input,
+.ui.form input:not([type]),
+.ui.form input[type="text"],
+.ui.form input[type="password"],
+.ui.form input[type="number"],
+.ui.form input[type="email"],
+.ui.form input[type="url"],
+.ui.form textarea,
+.ui.selection.dropdown{
+    background: var(--input_color);
+    color: var(--text_color);
+    border: 1px solid var(--button_border_color);
+    border-radius: var(--radius);
+    font-family: var(--font_body);
+}
+.ui.input > input:focus,
+.ui.form input:focus,
+.ui.form textarea:focus,
+.ui.selection.dropdown:focus,
+.ui.selection.active.dropdown{
+    border-color: var(--beacon) !important;
+    box-shadow: 0 0 0 2px var(--beacon_soft) !important;
+    color: var(--text_color) !important;
+}
+
+/* Monospace where the value is an address, port or pattern */
+input[type="text"][placeholder*="."],
+input[type="text"][placeholder*="/"],
+input[type="text"][placeholder*=":"]{
+    font-family: var(--font_mono);
+    font-size: 0.95em;
+}
+
+/* ---- Dropdown menus ---- */
+.ui.selection.dropdown .menu,
+.ui.dropdown .menu{
+    background: var(--theme_bg_primary);
+    border: 1px solid var(--divider_color);
+    border-radius: var(--radius);
+}
+.ui.dropdown .menu > .item{
+    color: var(--text_color) !important;
+    font-family: var(--font_body);
+}
+.ui.dropdown .menu > .item:hover{
+    background: var(--beacon_soft) !important;
+}
+
+/* ---- Tables: chart-grid styling ---- */
+.ui.table{
+    background: var(--table_bg_default);
+    color: var(--text_color);
+    border: 1px solid var(--divider_color);
+    border-radius: var(--radius);
+    font-family: var(--font_body);
+}
+.ui.table thead th{
+    background: var(--table_header_color);
+    color: var(--table_header_text_color) !important;
+    font-family: var(--font_body);
+    font-weight: 600;
+    font-size: 0.82em;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--divider_color);
+}
+.ui.table tr td{
+    border-top: 1px solid var(--divider_color);
+}
+.ui.basic.table{
+    border: none;
+}
+.ui.celled.table tr td, .ui.celled.table tr th{
+    border-left: 1px solid var(--divider_color);
+}
+
+/* ---- Checkboxes / toggles: buoy switches ---- */
+.ui.checkbox label,
+.ui.checkbox + label{
+    color: var(--text_color) !important;
+}
+.ui.checkbox label:before{
+    background: var(--input_color);
+    border: 1px solid var(--button_border_color);
+    border-radius: 4px;
+}
+.ui.checkbox input:checked ~ label:before{
+    background: var(--beacon) !important;
+    border-color: var(--beacon) !important;
+}
+.ui.checkbox input:checked ~ label:after{
+    color: #14212B !important;
+}
+.ui.toggle.checkbox label:before{
+    background: var(--buttom_toggle_disabled) !important;
+    border-radius: 500rem;
+}
+.ui.toggle.checkbox input:checked ~ label:before{
+    background: var(--starboard) !important;
+}
+
+/* ---- Messages ---- */
+.ui.message{
+    border-radius: var(--radius);
+    box-shadow: none;
+    border: 1px solid var(--divider_color);
+    background: var(--theme_bg_primary);
+    color: var(--text_color);
+}
+.ui.yellow.message, .ui.warning.message{
+    border-left: 3px solid var(--beacon);
+    background: var(--beacon_soft);
+    color: var(--text_color);
+}
+.ui.red.message, .ui.negative.message{
+    border-left: 3px solid var(--port);
+    background: rgba(227, 87, 75, 0.08);
+    color: var(--text_color);
+}
+.ui.green.message, .ui.positive.message{
+    border-left: 3px solid var(--starboard);
+    background: rgba(55, 178, 108, 0.08);
+    color: var(--text_color);
+}
+
+/* ---- Labels ---- */
+.ui.label{
+    border-radius: 4px;
+    font-family: var(--font_body);
+    font-weight: 600;
+}
+.ui.basic.label{
+    background: transparent;
+    border: 1px solid var(--button_border_color);
+    color: var(--text_color_secondary);
+}
+
+/* ---- Tabular menus ---- */
+.ui.tabular.menu{
+    border-bottom: 1px solid var(--divider_color);
+}
+.ui.tabular.menu .item{
+    font-family: var(--font_body);
+    font-weight: 500;
+    color: var(--text_color_secondary) !important;
+}
+.ui.tabular.menu .active.item{
+    background: var(--theme_bg_primary) !important;
+    border-color: var(--divider_color) !important;
+    border-top: 2px solid var(--beacon) !important;
+    color: var(--text_color) !important;
+    border-radius: 0 !important;
+}
+
+/* ---- Dividers ---- */
+.ui.divider{
+    border-top-color: var(--divider_color) !important;
+    border-bottom-color: transparent !important;
+}
+
+/* ---- Progress bars ---- */
+.ui.progress .bar{
+    background: var(--beacon);
+    border-radius: 4px;
+}
+
+/* ---- Scrollbars: thin channel markers ---- */
+::-webkit-scrollbar{
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb{
+    background: var(--divider_color);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover{
+    background: var(--text_color_secondary);
+    background-clip: content-box;
+}
+
+/* ---- Focus visibility (keyboard nav) ---- */
+a:focus-visible, button:focus-visible, .ui.button:focus-visible{
+    outline: 2px solid var(--beacon);
+    outline-offset: 2px;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ---- Scrollbars, selection, table ergonomics polish ---- */
+
+/* Firefox: themed thin scrollbars everywhere (inherits down the tree) */
+body{
+    scrollbar-color: var(--divider_color) transparent;
+    scrollbar-width: thin;
+}
+
+/* Webkit: slimmer bars, invisible track */
+::-webkit-scrollbar{
+    width: 8px;
+    height: 8px;
+}
+
+/* Text selection carries the beacon */
+::selection{
+    background: rgba(245, 168, 60, 0.3);
+    color: inherit;
+}
+
+/* Long tables keep their header in view while their pane scrolls */
+.ui.table thead th{
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Row hover: subtle sounding-line highlight on data tables */
+.ui.table tbody tr:hover td{
+    background-color: var(--theme_bg_active);
 }

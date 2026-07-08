@@ -1139,3 +1139,334 @@ body.darkTheme .menudivider{
     border-radius: 0.6em;
     box-shadow: 0 0 0 max(100vh, 100vw) rgba(0, 0, 0, .3);
 }
+/* ============================================================
+   HARBOR SHELL
+   Signal bar (top) + chart-index sidebar. The top bar stays
+   night-side in both themes; the beacon beam is the amber
+   hairline along the very top of the viewport.
+   ============================================================ */
+
+.menubar{
+    background: var(--shell_bg) !important;
+    border-bottom: 1px solid var(--shell_border);
+    padding-top: 0.55em;
+    padding-bottom: 0.5em;
+}
+
+/* The beacon beam */
+.menubar::before{
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--beacon) 0%, rgba(245,168,60,0.25) 60%, transparent 100%);
+}
+
+body.darkTheme .menubar{
+    background: var(--shell_bg) !important;
+}
+
+.menubar .logo{
+    height: 30px;
+}
+
+/* Signal bar buttons: quiet, monochrome, no boxes */
+.menubar .ui.basic.icon.button,
+.menubar .ui.icon.button,
+#themeColorButton{
+    background: transparent !important;
+    color: var(--shell_text) !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--radius);
+}
+.menubar .ui.icon.button:hover,
+#themeColorButton:hover{
+    border-color: var(--shell_border) !important;
+    color: var(--beacon) !important;
+}
+.menubar .ui.icon.button i.icon,
+#themeColorButton i.icon{
+    color: inherit !important;
+}
+body.darkTheme #themeColorButton{
+    background: transparent !important;
+}
+
+/* ---- Chart-index sidebar ---- */
+.toolbar{
+    width: 250px;
+    padding: 0 0.8em;
+}
+
+/* Menu items: quiet rows, mono-adjacent weight, buoy on active */
+#mainmenu.ui.secondary.vertical.menu .item{
+    color: var(--item_color) !important;
+    font-family: var(--font_body);
+    font-weight: 500;
+    font-size: 0.95em;
+    border-radius: 6px;
+    padding-top: 0.6em;
+    padding-bottom: 0.6em;
+    position: relative;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+#mainmenu.ui.secondary.vertical.menu .item:hover{
+    background: var(--theme_bg_active) !important;
+    color: var(--text_color) !important;
+}
+#mainmenu.ui.secondary.vertical.menu .active.item{
+    background: var(--beacon_soft) !important;
+    color: var(--text_color) !important;
+    font-weight: 600;
+}
+/* The buoy: a small amber channel marker on the active route */
+#mainmenu.ui.secondary.vertical.menu .active.item::before{
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 2px;
+    background: var(--beacon);
+}
+#mainmenu .item i.icon{
+    opacity: 0.75;
+}
+
+/* Group headers: chart index eyebrows */
+.menugroup-header,
+.recent-section-header{
+    font-family: var(--font_body);
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text_color_secondary);
+}
+.menugroup-header:hover,
+.recent-section-header:hover{
+    background-color: var(--theme_bg_active);
+    color: var(--text_color);
+}
+body.darkTheme .menugroup-header,
+body.darkTheme .recent-section-header{
+    color: var(--text_color_secondary);
+}
+body.darkTheme .menugroup-header:hover,
+body.darkTheme .recent-section-header:hover{
+    background-color: var(--theme_bg_active);
+    color: var(--text_color);
+}
+
+/* Group item channel: soundings line */
+.menugroup-items{
+    border-left: 1px solid var(--divider_color);
+    margin-left: 0.9em;
+}
+
+.recent-item:hover{
+    background-color: var(--theme_bg_active);
+}
+body.darkTheme .recent-item:hover{
+    background-color: var(--theme_bg_active);
+}
+
+/* ---- Content window: chart sheet ---- */
+.contentWindow{
+    background-color: var(--theme_bg_primary);
+    border: 1px solid var(--divider_color);
+    border-radius: var(--radius_lg);
+}
+
+/* Mobile drawer matches theme */
+@media screen and (max-width: 748px) {
+    .toolbar{
+        background-color: var(--theme_bg_primary);
+        border-left: 1px solid var(--divider_color);
+    }
+}
+
+/* Side wrapper (snippet editor drawer) */
+.sideWrapper .content{
+    background-color: var(--theme_bg_primary);
+}
+.sideWrapperMenu{
+    height: 2px;
+    background: linear-gradient(90deg, var(--beacon), transparent);
+}
+
+/* ============================================================
+   APP FRAME
+   Fixed signal bar, independently scrolling sidebar and
+   content pane. The document itself never scrolls; each
+   column manages its own overflow.
+   ============================================================ */
+
+html, body{
+    height: 100%;
+}
+body{
+    overflow: hidden;
+}
+
+.wrapper{
+    position: fixed;
+    top: 53px;               /* signal bar height */
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: stretch;
+    padding-top: 0;
+    padding-right: 0.8em;
+    padding-bottom: 0.8em;
+}
+
+.toolbar{
+    position: static;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    flex-shrink: 0;
+    padding-top: 0.6em;
+    padding-bottom: 2.5em;   /* last menu group stays reachable */
+    scrollbar-width: thin;
+}
+
+.contentWindow{
+    flex: 1 1 auto;
+    width: auto;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    margin-right: 0;
+}
+
+/* Mobile: sidebar returns to a right-hand drawer over the content */
+@media screen and (max-width: 748px) {
+    .wrapper{
+        padding-right: 0;
+        padding-bottom: 0;
+    }
+    .toolbar{
+        position: fixed;
+        top: 53px;
+        right: 0;
+        height: calc(100% - 53px);
+        width: 250px;
+        background-color: var(--theme_bg_primary);
+        border-left: 1px solid var(--divider_color);
+        padding: 1em;
+        z-index: 9;
+    }
+    .contentWindow{
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+/* ---- Frame alignment + chrome polish ---- */
+
+/* The signal bar owns an exact height so nothing hides underneath it */
+.menubar{
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.menubar .item{
+    display: flex;
+    align-items: center;
+}
+.menubar > .ui.right.floated.buttons{
+    margin-left: auto;
+    padding-top: 0 !important;
+}
+.menubar > .ui.right.floated.buttons ~ .ui.right.floated.buttons{
+    margin-left: 0;
+}
+
+.wrapper{
+    top: 56px;
+}
+.sideWrapper,
+.sideWrapper .fadingBackground{
+    top: 56px;
+}
+.sideWrapper .fadingBackground{
+    height: calc(100% - 56px);
+}
+
+@media screen and (max-width: 748px) {
+    .toolbar{
+        top: 56px;
+        height: calc(100% - 56px);
+    }
+}
+
+/* Sidebar scrollbar: only surfaces while the pointer is over it */
+.toolbar::-webkit-scrollbar{
+    width: 6px;
+}
+.toolbar::-webkit-scrollbar-thumb{
+    background: transparent;
+    background-clip: content-box;
+}
+.toolbar:hover::-webkit-scrollbar-thumb{
+    background: var(--divider_color);
+    background-clip: content-box;
+}
+
+/* Toast + confirm box join the harbor system */
+#messageBox{
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+#confirmBox{
+    background-color: var(--theme_bg_primary);
+    color: var(--text_color);
+    border: 1px solid var(--divider_color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+#confirmBox .ui.progress .bar{
+    background: var(--beacon) !important;
+}
+
+/* ---- Sidebar: scrollable with a fully hidden scrollbar ----
+   Scrolling the nav is intuitively discoverable; the bar and its
+   gutter only added width. */
+.toolbar{
+    width: 240px;
+    scrollbar-width: none;      /* Firefox */
+    -ms-overflow-style: none;   /* legacy Edge/IE */
+}
+.toolbar::-webkit-scrollbar{
+    display: none;              /* Chrome/Safari: no bar, no gutter */
+}
+.toolbar:hover::-webkit-scrollbar-thumb{
+    background: transparent;
+}
+
+/* ---- Sidebar: menu fills the full rail width ----
+   Semantic gives vertical menus a fixed 15rem width, leaving dead
+   space against the content sheet. */
+#mainmenu.ui.secondary.vertical.menu{
+    width: 100%;
+    margin: 0;
+}
+.toolbar{
+    padding-left: 0.6em;
+    padding-right: 0.4em;
+}

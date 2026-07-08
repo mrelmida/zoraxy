@@ -7,237 +7,345 @@
     <meta name="zoraxy.csrf.Token" content="{{.csrfToken}}">
     <link rel="icon" type="image/png" href="./favicon.png" />
     <title>Login | Zoraxy</title>
-    <link rel="stylesheet" href="script/semantic/semantic.min.css">
-    <link href="script/aos.css" rel="stylesheet">
-    <script src="script/aos.js"></script>
     <script type="application/javascript" src="script/jquery-3.6.0.min.js"></script>
-    <script type="application/javascript" src="script/semantic/semantic.min.js"></script>
     <style>
-        body {
-            background: rgb(231, 231, 231);
+        /* Harbor night — the login page is always night-side */
+        @font-face{
+            font-family: "Saira";
+            font-weight: 600;
+            src: url("fonts/saira-600.woff2") format("woff2");
+            font-display: swap;
+        }
+        @font-face{
+            font-family: "Instrument Sans";
+            font-weight: 400;
+            src: url("fonts/instrument-sans-400.woff2") format("woff2");
+            font-display: swap;
+        }
+        @font-face{
+            font-family: "Instrument Sans";
+            font-weight: 600;
+            src: url("fonts/instrument-sans-600.woff2") format("woff2");
+            font-display: swap;
+        }
+        @font-face{
+            font-family: "IBM Plex Mono";
+            font-weight: 400;
+            src: url("fonts/ibm-plex-mono-400.woff2") format("woff2");
+            font-display: swap;
         }
 
-        /* Time based background */
-        body.morning{
-            background: rgb(171,199,255);
-            background: linear-gradient(48deg, rgba(171,199,255,1) 21%, rgba(193,227,255,1) 79%); 
+        :root{
+            --fathom: #0A121A;
+            --chartroom: #101B26;
+            --hull: #1F2F3D;
+            --foam: #E8EEF2;
+            --mist: #8FA3B0;
+            --beacon: #F5A83C;
+            --beacon-soft: rgba(245, 168, 60, 0.12);
+            --port: #E3574B;
         }
 
-        body.afternoon{
-            background: rgb(108,172,255);
-            background: linear-gradient(21deg, rgba(108,172,255,1) 21%, rgba(141,235,255,1) 79%); 
+        *{ box-sizing: border-box; }
+
+        html, body{
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: var(--fathom);
+            font-family: "Instrument Sans", system-ui, sans-serif;
+            color: var(--foam);
         }
 
-        body.evening{
-            background: rgb(247,143,173);
-            background: linear-gradient(21deg, rgba(247,143,173,1) 21%, rgba(253,235,130,1) 79%); 
+        /* Depth-contour backdrop: soundings of the harbor floor */
+        .contours{
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
         }
 
-        body.night{
-            background: rgb(18,19,23);
-            background: linear-gradient(48deg, rgba(18,19,23,1) 21%, rgba(50,59,66,1) 79%); 
+        .stage{
+            position: relative;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2em 1em;
+        }
+
+        .logbook{
+            position: relative;
+            width: 400px;
+            max-width: 100%;
+            background: var(--chartroom);
+            border: 1px solid var(--hull);
+            border-radius: 12px;
+            padding: 2.4em 2.2em 2em;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+            animation: surface 0.5s ease-out;
+        }
+        @keyframes surface{
+            from{ opacity: 0; transform: translateY(10px); }
+            to{ opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce){
+            .logbook{ animation: none; }
+        }
+
+        /* Beacon beam across the top of the card */
+        .logbook::before{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12px;
+            right: 12px;
+            height: 2px;
+            border-radius: 2px;
+            background: linear-gradient(90deg, var(--beacon), rgba(245,168,60,0.15));
+        }
+
+        .brand{
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+            margin-bottom: 1.8em;
+        }
+        .brand img{
+            height: 38px;
+        }
+        .brand .sub{
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.72em;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--mist);
+        }
+
+        .fieldrow{
+            margin-bottom: 1em;
+        }
+        .fieldrow label{
+            display: block;
+            font-size: 0.78em;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--mist);
+            margin-bottom: 0.45em;
+        }
+        .fieldrow input[type="text"],
+        .fieldrow input[type="password"]{
+            width: 100%;
+            background: #0C161E;
+            border: 1px solid var(--hull);
+            border-radius: 8px;
+            color: var(--foam);
+            font-family: "Instrument Sans", system-ui, sans-serif;
+            font-size: 1em;
+            padding: 0.75em 0.9em;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .fieldrow input:focus{
+            border-color: var(--beacon);
+            box-shadow: 0 0 0 3px var(--beacon-soft);
+        }
+
+        .rmbrow{
+            display: flex;
+            align-items: center;
+            gap: 0.55em;
+            margin: 1.1em 0 1.4em;
+            font-size: 0.9em;
+            color: var(--mist);
+            user-select: none;
+        }
+        .rmbrow input[type="checkbox"]{
+            appearance: none;
+            width: 17px;
+            height: 17px;
+            border: 1px solid var(--hull);
+            border-radius: 4px;
+            background: #0C161E;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .rmbrow input[type="checkbox"]:checked{
+            background: var(--beacon);
+            border-color: var(--beacon);
+        }
+        .rmbrow input[type="checkbox"]:checked::after{
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 1.5px;
+            width: 4px;
+            height: 9px;
+            border: solid #14212B;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .rmbrow label{ cursor: pointer; }
+
+        .btn{
+            display: block;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            font-family: "Instrument Sans", system-ui, sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            padding: 0.8em;
+            cursor: pointer;
+            text-align: center;
+            transition: filter 0.12s ease, background 0.12s ease;
+        }
+        .btn.primary{
+            background: var(--beacon);
+            color: #14212B;
+        }
+        .btn.primary:hover{ filter: brightness(1.08); }
+        .btn.quiet{
+            background: transparent;
+            border: 1px solid var(--hull);
+            color: var(--mist);
+            margin-top: 0.7em;
+        }
+        .btn.quiet:hover{
+            border-color: var(--beacon);
+            color: var(--foam);
+        }
+        .btn:focus-visible{
+            outline: 2px solid var(--beacon);
+            outline-offset: 2px;
         }
 
         #errmsg{
-            color: #9f3a38;
+            display: none;
             margin-top: 1em;
-            margin-bottom: 0.4em;
-            text-align: left;
+            padding: 0.7em 0.9em;
+            border-left: 3px solid var(--port);
+            background: rgba(227, 87, 75, 0.1);
+            border-radius: 0 6px 6px 0;
+            font-size: 0.88em;
+            color: var(--foam);
         }
 
-        .registerOnly{
-            display:none;
+        .registerOnly{ display: none; }
+        .setupNote{
+            font-size: 0.88em;
+            color: var(--mist);
+            margin: -0.8em 0 1.4em;
         }
 
-        .ui.fluid.button.registerOnly{
-            display:none;
-        }
-
-        #loginForm {
-                border-radius: 1em;
-                width: 25em;
-                height: 450px;
-                position: absolute; /*Can also be `fixed`*/
-                left: 0;
-                right: 0;
-                top: 0;
-                bottom: 0;
-                margin: auto;
-                /*Solves a problem in which the content is being cut when the div is smaller than its' wrapper:*/
-                max-width: 100%;
-                max-height: 100%;
-                overflow: auto;
-                background-color: white;
-        }
-
-        .wavebase {
-            position:fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height:5vh;
-            text-align:center;
-            padding-top: 1em;
-            background-color: white;
-        }
-
-        /* 
-            Waves CSS 
-        */
-
-        #wavesWrapper{
+        .harborfoot{
             position: fixed;
-            bottom: 5vh;
-            width: 100%;
+            bottom: 1.1em;
             left: 0;
-        }
-        
-        .waves {
-            position:relative;
             width: 100%;
-            height:15vh;
-            margin-bottom:-7px; /*Fix for safari gap*/
-            min-height:100px;
-            max-height:150px;
+            text-align: center;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7em;
+            letter-spacing: 0.1em;
+            color: var(--mist);
+            opacity: 0.7;
         }
-
-        
-        .parallax > use {
-            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5)     infinite;
-        }
-        .parallax > use:nth-child(1) {
-            animation-delay: -8s;
-            animation-duration: 28s;
-        }
-        .parallax > use:nth-child(2) {
-            animation-delay: -12s;
-            animation-duration: 40s;
-        }
-        .parallax > use:nth-child(3) {
-            animation-delay: -16s;
-            animation-duration: 52s;
-        }
-        .parallax > use:nth-child(4) {
-            animation-delay: -20s;
-            animation-duration: 80s;
-        }
-        @keyframes move-forever {
-            0% {
-                transform: translate3d(-90px,0,0);
-            }
-            100% { 
-                transform: translate3d(85px,0,0);
-            }
-        }
-        /*Shrinking for mobile*/
-        @media (max-width: 768px) {
-            .waves {
-                height:40px;
-                min-height:40px;
-            }
+        .harborfoot a{
+            color: var(--beacon);
+            text-decoration: none;
         }
     </style>
     </head>
     <body>
-        <script>
-            $(document).ready(function() {
-                var currentHour = new Date().getHours();
-                if (currentHour >= 5 && currentHour < 12) {
-                    $("body").addClass("morning");
-                } else if (currentHour >= 12 && currentHour < 17) {
-                    $("body").addClass("afternoon");
-                } else if (currentHour >= 17 && currentHour < 20) {
-                    $("body").addClass("evening");
-                } else {
-                    $("body").addClass("night");
-                }
-            });
+        <!-- Depth contours of the harbor floor, with soundings -->
+        <svg class="contours" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <g fill="none" stroke="#1F2F3D" stroke-width="1.2">
+                <path d="M-50,700 C250,640 420,760 720,700 S1200,610 1490,690" />
+                <path d="M-50,760 C260,700 460,820 760,760 S1230,680 1490,750" opacity="0.8"/>
+                <path d="M-50,820 C270,770 500,880 800,820 S1260,750 1490,810" opacity="0.6"/>
+                <path d="M-50,140 C300,200 520,80 820,140 S1250,230 1490,150" opacity="0.7"/>
+                <path d="M-50,80 C320,130 540,20 840,80 S1270,160 1490,90" opacity="0.45"/>
+                <path d="M-50,420 C200,390 380,460 640,430 S1150,370 1490,430" opacity="0.3"/>
+            </g>
+            <g fill="#3E5566" font-family="IBM Plex Mono, monospace" font-size="11">
+                <text x="180" y="688">14</text>
+                <text x="640" y="748">17</text>
+                <text x="1080" y="672">12</text>
+                <text x="380" y="128">9</text>
+                <text x="940" y="176">7</text>
+                <text x="1240" y="420">21</text>
+            </g>
+            <!-- The beacon: a single lit marker on the chart -->
+            <circle cx="1180" cy="182" r="3.5" fill="#F5A83C"/>
+            <circle cx="1180" cy="182" r="9" fill="none" stroke="#F5A83C" stroke-opacity="0.35"/>
+            <circle cx="1180" cy="182" r="16" fill="none" stroke="#F5A83C" stroke-opacity="0.12"/>
+        </svg>
 
-            // csrf Ajax wrapper
-            $.cjax = function(payload){
-                let requireTokenMethod = ["POST", "PUT", "DELETE"];
-                if (requireTokenMethod.includes(payload.method) || requireTokenMethod.includes(payload.type)){
-                    //csrf token is required
-                    let csrfToken = document.querySelector('meta[name="zoraxy.csrf.Token"]').getAttribute("content");                    payload.headers = {
-                        "X-CSRF-Token": csrfToken,
-                    }
-                }
+        <div class="stage">
+            <form class="logbook" onsubmit="return false;">
+                <div class="brand">
+                    <img src="img/logo_white.svg" alt="Zoraxy">
+                    <span class="sub">Gateway<br>Control</span>
+                </div>
 
-                $.ajax(payload);
-            }
-        </script>
-        <div id="loginForm" class="ui middle aligned center aligned grid" data-aos="fade-up">
-            <div class="column" style="padding-top: 0 !important;">
-                <form class="ui large form content">
-                    <div class="ui basic segment">
-                        <img class="ui fluid image" src="img/public/logo.svg" style="pointer-events:none;">
-                        <p class="registerOnly">Account Setup</p>
-                        <div class="field">
-                            <div class="ui left icon input">
-                                <i class="user icon"></i>
-                                <input id="username" type="text" name="username" placeholder="Username">
-                            </div>
-                        </div>
-                        <div class="field">
-                            <div class="ui left icon input">
-                                <i class="lock icon"></i>
-                                <input id="magic" type="password" name="password" placeholder="Password">
-                            </div>
-                        </div>
-                        <div class="field registerOnly">
-                            <div class="ui left icon input">
-                                <i class="lock icon"></i>
-                                <input id="repeatMagic" type="password" name="passwordconfirm" placeholder="Confirm Password" >
-                            </div>
-                        </div>
-                        <div class="field loginOnly" style="text-align: left;">
-                            <div class="ui checkbox">
-                            <input id="rmbme" type="checkbox" tabindex="0" class="hidden">
-                            <label>Remember Me</label>
-                            </div>
-                        </div>
-                        <div id="loginbtn" class="ui fluid basic button loginOnly"> <i class="ui blue sign-in icon"></i> Login</div>
-                        <div id="ssologinbtn" class="ui fluid basic button loginOnly" style="display: none; margin-top: 0.6em;"><i class="ui teal id badge icon"></i> Login with SSO</div>
-                        <div id="regsiterbtn" class="ui fluid basic button registerOnly"><i class="ui green checkmark icon"></i> Confirm</div>
-                        <div id="errmsg"></div>
-                    </div>
-                </form>
-            </div>
+                <p class="setupNote registerOnly">No admin account exists yet. Create the management account for this gateway.</p>
+
+                <div class="fieldrow">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" autocomplete="username" autofocus>
+                </div>
+                <div class="fieldrow">
+                    <label for="magic">Password</label>
+                    <input id="magic" type="password" name="password" autocomplete="current-password">
+                </div>
+                <div class="fieldrow registerOnly">
+                    <label for="repeatMagic">Confirm password</label>
+                    <input id="repeatMagic" type="password" name="passwordconfirm" autocomplete="new-password">
+                </div>
+
+                <div class="rmbrow loginOnly">
+                    <input id="rmbme" type="checkbox">
+                    <label for="rmbme">Keep me signed in for a week</label>
+                </div>
+
+                <button id="loginbtn" class="btn primary loginOnly" type="submit">Sign in</button>
+                <button id="ssologinbtn" class="btn quiet loginOnly" type="button" style="display:none;">Sign in with SSO</button>
+                <button id="regsiterbtn" class="btn primary registerOnly" type="button">Create account</button>
+
+                <div id="errmsg"></div>
+            </form>
         </div>
-        <div id="wavesWrapper">
-            <!-- CSS waves-->
-            <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
-                <defs>
-                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
-                </defs>
-                <g class="parallax">
-                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(255,255,255,0.7" />
-                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(255,255,255,0.5)" />
-                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255,255,255,0.3)" />
-                <use xlink:href="#gentle-wave" x="48" y="7" fill="#fff" />
-                </g>
-            </svg>
+
+        <div class="harborfoot">
+            <p>Powered by <a href="https://zoraxy.aroz.org" target="_blank">Zoraxy</a></p>
         </div>
-        <div class="wavebase">
-            <p>Proudly powered by <a href="https://zoraxy.aroz.org" target="_blank">Zoraxy</a></p>
-        </div>
+
     <script>
-        AOS.init();
         var registerMode = false;
         var redirectionAddress = "/";
         var loginAddress = "/api/auth/login";
-        $(".checkbox").checkbox();
-        $(document).ready(function(){
-            var currentdate = new Date(); 
-            var datetime = currentdate.getDate() + "/"
-                + (currentdate.getMonth()+1)  + "/" 
-                + currentdate.getFullYear() + " "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
-            $("#requestTime").text(datetime);
 
+        // csrf Ajax wrapper
+        $.cjax = function(payload){
+            let requireTokenMethod = ["POST", "PUT", "DELETE"];
+            if (requireTokenMethod.includes(payload.method) || requireTokenMethod.includes(payload.type)){
+                let csrfToken = document.querySelector('meta[name="zoraxy.csrf.Token"]').getAttribute("content");
+                payload.headers = {
+                    "X-CSRF-Token": csrfToken,
+                }
+            }
+            $.ajax(payload);
+        }
+
+        function showError(msg){
+            $("#errmsg").html(msg);
+            $("#errmsg").stop().finish().slideDown('fast');
+        }
+
+        $(document).ready(function(){
             //Check if this is a new system
             $.get("/api/auth/userCount", function(data){
                 if (data == 0){
@@ -247,178 +355,122 @@
                     $(".registerOnly").show();
                 }
             });
+
             //Show the SSO button if admin OIDC login is enabled
             $.get("/api/auth/oidc/status", function(data){
-                if (data && data.enabled === true){
+                if (data && data.enabled === true && !registerMode){
                     $("#ssologinbtn").show();
                 }
             });
+
             //Show error if we got bounced back from a failed SSO attempt
             if (get("ssoerror") !== undefined){
-                $("#errmsg").html(`<i class="red remove icon"></i> SSO login failed. Check the Zoraxy logs for details.`);
-                $("#errmsg").show();
+                showError("SSO sign-in failed. Check the Zoraxy logs for details.");
             }
+
             //Check if the user already logged in
-            $.get("/api/auth/checkLogin",function(data){
+            $.get("/api/auth/checkLogin", function(data){
                 try{
                     if (data === true || data.trim() == "true"){
-                    //User already logged in. Redirect to target page.
-                    if (redirectionAddress == ""){
-                        //Redirect back to index
-                        window.location.href = "/";
-                    }else{
-                        console.log(data);
-                        //window.location.href = redirectionAddress;
+                        window.location.href = redirectionAddress;
                     }
-                }
                 }catch(ex){
                     //Assume not logged in
-                    console.log(data);
                 }
-                
             });
-            
         });
 
-        function updateYear() {
-            const year = new Date().getFullYear();
-            const elements = document.getElementsByClassName("year");
-            for (let i = 0; i < elements.length; i++) {
-                elements[i].textContent = year;
-            }
-        }
-        updateYear();
-
-        //Event handlers for buttons
-        $("#loginbtn").on("click",function(){
+        $("#loginbtn").on("click", function(){
             login();
         });
 
-        $("#ssologinbtn").on("click",function(){
+        $("#ssologinbtn").on("click", function(){
             window.location.href = "/api/auth/oidc/login";
         });
 
-        $("input").on("keydown",function(event){
+        $("input").on("keydown", function(event){
             if (event.keyCode === 13) {
                 event.preventDefault();
                 if (registerMode){
-                    //Register mode
                     if ($(this).attr("id") == "repeatMagic"){
                         $("#regsiterbtn").click();
                     }else{
-                        //Focus to next field
-                        $(this).next().focus();
+                        $(this).closest(".fieldrow").nextAll(".fieldrow").first().find("input").focus();
                     }
                 }else{
-                    //Login mode
                     if ($(this).attr("id") == "magic"){
                         login();
                     }else{
-                        //Fuocus to password field
                         $("#magic").focus();
                     }
                 }
             }
         });
 
-        $("#regsiterbtn").on("click", function(event){
+        $("#regsiterbtn").on("click", function(){
             let username = $("#username").val();
             let magic = $("#magic").val();
             let repeatMagic = $("#repeatMagic").val();
-            let csrfToken = document.querySelector('meta[name="zoraxy.csrf.Token"]').getAttribute("content");
             if (magic !== repeatMagic) {
-                alert("Password does not match");
+                showError("Passwords do not match");
                 return;
             }
-
-            $.ajax({
+            $.cjax({
                 url: "/api/auth/register",
                 method: "POST",
-                beforeSend: function(request) {
-                    request.setRequestHeader("X-CSRF-Token",csrfToken);
-                },
                 data: {
                     username: username,
                     password: magic
                 },
                 success: function(data) {
                     if (data.error != undefined){
-                        alert(data.error);
+                        showError(data.error);
                     }else{
                         //Register success. Refresh page
                         window.location.reload();
                     }
                 },
-                error: function(xhr, status, error) {
-                    console.error("Error registering user:", error);
+                error: function() {
+                    showError("Unable to create account");
                 }
             });
         });
-
 
         //Login system with the given username and password
         function login(){
             let username = $("#username").val();
             let magic = $("#magic").val();
             let rmbme = document.getElementById("rmbme").checked;
-            let csrfToken = document.querySelector('meta[name="zoraxy.csrf.Token"]').getAttribute("content");
             $("#errmsg").stop().finish().slideUp("fast");
-            $("input").addClass('disabled');
             $.cjax({
-                url: loginAddress, 
+                url: loginAddress,
                 type: "POST",
-                beforeSend: function(request) {
-                    request.setRequestHeader("X-CSRF-Token",csrfToken);
-                },
                 data: {
-                    "username": username, 
-                    "password": magic, 
+                    "username": username,
+                    "password": magic,
                     "rmbme": rmbme,
                 },
                 success: function(data){
                     if (data.error !== undefined){
-                        //Something went wrong during the login
-                        $("#errmsg").html(`<i class="red remove icon"></i> ${data.error}`);
-                        $("#errmsg").stop().finish().slideDown('fast');
+                        showError(data.error);
                     }else if(data.redirect !== undefined){
                         //LDAP Related Code
                         window.location.href = data.redirect;
                     }else{
                         //Login succeed
-                        if (redirectionAddress == ""){
-                            //Redirect back to index
-                            window.location.href = "./";
-                        }else{
-                            window.location.href = redirectionAddress;
-                        }
+                        window.location.href = redirectionAddress;
                     }
-                    $("input").removeClass('disabled');
                 },
                 error: function(){
-                    alert("Something went wrong.")
+                    showError("Unable to reach the login service");
                 }
             });
-
         }
 
         function get(name){
             if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
                 return decodeURIComponent(name[1]);
         }
-
-        $(".thisyear").text(new Date().getFullYear());
-
-        function updateRenderElements(){
-            if (window.innerHeight < 520){
-                $(".bottombar").hide();
-            }else{
-                $(".bottombar").show();
-            }
-        }
-        updateRenderElements();
-        $(window).on("resize", function(){
-            updateRenderElements();
-        });
     </script>
     </body>
 </html>
