@@ -66,6 +66,11 @@ func LoadReverseProxyConfig(configFilepath string) error {
 		thisConfigEndpoint.TlsOptions = tlscert.GetDefaultHostSpecificTlsBehavior()
 	}
 
+	//Make sure the path policy rules are not nil
+	if thisConfigEndpoint.PathPolicyRules == nil {
+		thisConfigEndpoint.PathPolicyRules = []*dynamicproxy.PathPolicyRule{}
+	}
+
 	//Matching domain not set. Assume root
 	if thisConfigEndpoint.RootOrMatchingDomain == "" {
 		thisConfigEndpoint.RootOrMatchingDomain = "/"

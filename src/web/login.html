@@ -197,6 +197,7 @@
                             </div>
                         </div>
                         <div id="loginbtn" class="ui fluid basic button loginOnly"> <i class="ui blue sign-in icon"></i> Login</div>
+                        <div id="ssologinbtn" class="ui fluid basic button loginOnly" style="display: none; margin-top: 0.6em;"><i class="ui teal id badge icon"></i> Login with SSO</div>
                         <div id="regsiterbtn" class="ui fluid basic button registerOnly"><i class="ui green checkmark icon"></i> Confirm</div>
                         <div id="errmsg"></div>
                     </div>
@@ -246,6 +247,17 @@
                     $(".registerOnly").show();
                 }
             });
+            //Show the SSO button if admin OIDC login is enabled
+            $.get("/api/auth/oidc/status", function(data){
+                if (data && data.enabled === true){
+                    $("#ssologinbtn").show();
+                }
+            });
+            //Show error if we got bounced back from a failed SSO attempt
+            if (get("ssoerror") !== undefined){
+                $("#errmsg").html(`<i class="red remove icon"></i> SSO login failed. Check the Zoraxy logs for details.`);
+                $("#errmsg").show();
+            }
             //Check if the user already logged in
             $.get("/api/auth/checkLogin",function(data){
                 try{
@@ -280,6 +292,10 @@
         //Event handlers for buttons
         $("#loginbtn").on("click",function(){
             login();
+        });
+
+        $("#ssologinbtn").on("click",function(){
+            window.location.href = "/api/auth/oidc/login";
         });
 
         $("input").on("keydown",function(event){

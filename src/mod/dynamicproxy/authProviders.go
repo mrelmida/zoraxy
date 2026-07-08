@@ -22,18 +22,41 @@ Central Authentication Provider Router
 This function will route the request to the correct authentication provider
 if the return value is true, do not continue to the next handler
 
-handleAuthProviderRouting takes in 4 parameters:
+handleAuthProviderRouting takes in 5 parameters:
 - sep: the ProxyEndpoint object
 - w: the http.ResponseWriter object
 - r: the http.Request object
 - h: the ProxyHandler object
+- matchedPolicy: the path policy rule matching this request, or nil
 
 and return a boolean indicate if the request is written to http.ResponseWriter
 - true: the request is handled, do not write to http.ResponseWriter
 - false: the request is not handled (usually means auth ok), continue to the next handler
 */
-func handleAuthProviderRouting(sep *ProxyEndpoint, w http.ResponseWriter, r *http.Request, h *ProxyHandler) bool {
+func handleAuthProviderRouting(sep *ProxyEndpoint, w http.ResponseWriter, r *http.Request, h *ProxyHandler, matchedPolicy *PathPolicyRule) bool {
 	requestHostname := r.Host
+
+	enforceAuth := sep.AuthenticationProvider.AuthMethod != AuthMethodNone
+	if sep.AuthenticationProvider.AuthScopePolicyPaths {
+		//Selective mode: only enforce endpoint auth on paths whose policy requires it
+		enforceAuth = false
+	}
+	if matchedPolicy != nil && matchedPolicy.RequireAuth {
+		//A policy that explicitly requires auth always enforces, regardless of scoping mode
+		enforceAuth = true
+	}
+	if !enforceAuth {
+		return false
+	}
+
+	if sep.AuthenticationProvider.AuthMethod == AuthMethodNone {
+		//A path policy demands authentication but no auth provider is configured. Fail closed.
+		h.Parent.Option.Logger.PrintAndLog("proxy-access", "Path policy requires authentication but no auth provider is configured for "+sep.RootOrMatchingDomain, nil)
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte("403 - Forbidden"))
+		h.Parent.Option.Logger.LogHTTPRequest(r, "host-http", 403, requestHostname, "")
+		return true
+	}
 
 	switch sep.AuthenticationProvider.AuthMethod {
 	case AuthMethodBasic:
@@ -62,7 +85,7 @@ func handleAuthProviderRouting(sep *ProxyEndpoint, w http.ResponseWriter, r *htt
 		}
 	}
 
-	//No authentication provider, do not need to handle
+	//Authentication passed, continue to the next handler
 	return false
 }
 

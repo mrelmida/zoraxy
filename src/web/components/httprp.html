@@ -276,11 +276,17 @@
                     <a class="item hrpedit_menu_item" cfgpage="accessrule">
                         <i class="star icon"></i> <span class="editorSideMenuText">Access Rules</span>
                     </a>
+                    <a class="item hrpedit_menu_item" cfgpage="pathpolicy">
+                        <i class="sitemap icon"></i> <span class="editorSideMenuText">Path Policies</span>
+                    </a>
                     <a class="item hrpedit_menu_item" cfgpage="security">
                         <i class="key icon"></i> <span class="editorSideMenuText">Security</span>
                     </a>
                     <a class="item hrpedit_menu_item" cfgpage="tags">
                         <i class="tags icon"></i> <span class="editorSideMenuText">Tags</span>
+                    </a>
+                    <a class="item hrpedit_menu_item" cfgpage="rawconfig">
+                        <i class="code icon"></i> <span class="editorSideMenuText">Raw Config</span>
                     </a>
                 </div>
 
@@ -507,6 +513,12 @@
 
                         </iframe>
                     </div>
+                    <!-- Path Policies -->
+                    <div class="rpconfig_content" rpcfg="pathpolicy">
+                        <iframe src="" class="wrapper_frame">
+
+                        </iframe>
+                    </div>
                     <!-- Security -->
                     <div class="rpconfig_content" rpcfg="security">
                         <div class="ui segment">
@@ -543,6 +555,12 @@
                                         <label>Zoraxy Auth</label>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="ui checkbox" style="margin-top: 0.4em;">
+                                <input type="checkbox" class="AuthScopePolicyPaths">
+                                <label>Scope authentication to path policies<br>
+                                    <small>Only require authentication on paths whose path policy has "Require Auth" enabled. Other paths are served without authentication.</small>
+                                </label>
                             </div>
                             <br>
                             <button class="ui basic compact small button editBasicAuthCredentialsBtn" style="margin-left: 0.4em; margin-top: 0.4em;"><i class="ui blue user circle icon"></i> Basic Auth Credentials</button>
@@ -652,6 +670,12 @@
                     </div>
                     <!-- Tags -->
                     <div class="rpconfig_content" rpcfg="tags">
+                        <iframe src="" class="wrapper_frame">
+
+                        </iframe>
+                    </div>
+                    <!-- Raw Config -->
+                    <div class="rpconfig_content" rpcfg="rawconfig">
                         <iframe src="" class="wrapper_frame">
 
                         </iframe>
@@ -1154,6 +1178,7 @@
         let uptimeMonitorURI = $(editor).find(".UptimeMonitorURI").val().trim();
         let disableAutoFallback = false; //$(editor).find(".DisableAutoFallback")[0].checked;
         let authProviderType = $(editor).find(".authProviderPicker input[type='radio']:checked").val();
+        let authScopePolicyPaths = $(editor).find(".AuthScopePolicyPaths")[0].checked;
         let requireRateLimit = $(editor).find(".RequireRateLimit")[0].checked;
         let rateLimit = $(editor).find(".RateLimit").val();
         let bypassGlobalTLS = $(editor).find(".BypassGlobalTLS")[0].checked;
@@ -1197,6 +1222,7 @@
                 "bpgtls": bypassGlobalTLS,
                 "enableConnectSupport": enableConnectSupport,
                 "authprovider" :authProviderType,
+                "authScopePolicyPaths": authScopePolicyPaths,
                 "rate" :requireRateLimit,
                 "dChunkedEnc": disableChunkedTransferEncoding,
                 "forceHTTP11": forceHTTP11,
@@ -1919,6 +1945,26 @@
             editor.find(".rpconfig_content[rpcfg='accessrule'] .wrapper_frame").attr('src', frameURL);
         })();
 
+        /* ------------ Path Policies ------------ */
+        (()=>{
+            let payload = encodeURIComponent(JSON.stringify({
+                ept: "host",
+                ep: uuid
+            }));
+            let frameURL = "snippet/pathPolicyEditor.html?t=" + Date.now() + "#" + payload;
+            editor.find(".rpconfig_content[rpcfg='pathpolicy'] .wrapper_frame").attr('src', frameURL);
+        })();
+
+        /* ------------ Raw Config ------------ */
+        (()=>{
+            let payload = encodeURIComponent(JSON.stringify({
+                ept: "host",
+                ep: uuid
+            }));
+            let frameURL = "snippet/rawConfigEditor.html?t=" + Date.now() + "#" + payload;
+            editor.find(".rpconfig_content[rpcfg='rawconfig'] .wrapper_frame").attr('src', frameURL);
+        })();
+
         /* ------------ Security ------------ */
     
         let authMethodContent = "";
@@ -1941,6 +1987,11 @@
         }
 
         editor.find(".authProviderPicker input[type='radio']").off("change").on("change", function() {
+            saveProxyInlineEdit(uuid);
+        });
+
+        editor.find(".AuthScopePolicyPaths").prop("checked", subd.AuthenticationProvider.AuthScopePolicyPaths == true);
+        editor.find(".AuthScopePolicyPaths").off("change").on("change", function() {
             saveProxyInlineEdit(uuid);
         });
 

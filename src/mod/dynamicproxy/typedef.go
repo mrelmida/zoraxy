@@ -152,6 +152,17 @@ type ZorxAuthExceptionRule struct {
 	UseTrustedProxy bool              //If true, trust proxy headers (X-Real-Ip, CF-Connecting-IP, etc.) for CIDR matching. WARNING: enabling this allows header spoofing if the upstream proxy is not trusted.
 }
 
+// PathPolicyRule defines a per-path policy on a proxy endpoint.
+// Rules are evaluated in order and the first matching rule wins.
+type PathPolicyRule struct {
+	ID           string //Unique ID of this rule, generated on create
+	PathPattern  string //Path prefix to match, e.g. /admin/, or regex pattern if IsRegex is set
+	IsRegex      bool   //If true, PathPattern is treated as a regular expression; otherwise it is a path prefix
+	AccessRuleID string //Access rule ID to enforce on this path, empty = no access rule check
+	RequireAuth  bool   //Require the endpoint's configured authentication provider on this path
+	Enabled      bool   //If false, this rule is skipped during evaluation
+}
+
 /* Routing Rule Data Structures */
 
 // A Virtual Directory endpoint, provide a subset of ProxyEndpoint for better
@@ -210,6 +221,11 @@ type AuthenticationProvider struct {
 
 	/* ZorxAuth SSO Settings */
 	ZorxAuthExceptionRules []*ZorxAuthExceptionRule //Rules to bypass ZorxAuth SSO authentication (path prefix/regex or IP/CIDR)
+
+	/* Path Policy Scoping */
+	//When true, the endpoint's auth method is only enforced on paths whose matching
+	//PathPolicyRule has RequireAuth set. Default false = enforce auth on all paths (legacy behavior).
+	AuthScopePolicyPaths bool
 }
 
 /* CAPTCHA Provider Configuration */
@@ -284,7 +300,8 @@ type ProxyEndpoint struct {
 	ForceHTTP11                    bool //Force use HTTP/1.1 for upstream connection
 
 	//Access Control
-	AccessFilterUUID string //Access filter ID
+	AccessFilterUUID string            //Access filter ID
+	PathPolicyRules  []*PathPolicyRule //Per-path policies, evaluated in order, first match wins
 
 	//Fallback routing logic (Special Rule Sets Only)
 	DefaultSiteOption int    //Fallback routing logic options

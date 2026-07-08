@@ -289,6 +289,15 @@ func (router *Router) handleNonTLSRequest(w http.ResponseWriter, r *http.Request
 		}
 	}
 
+	proxyHandler := router.mux.(*ProxyHandler)
+
+	//Per-path policy check (access rule half; auth half is enforced in the auth phase below)
+	matchedPolicy := sep.MatchPathPolicyRule(r)
+	if proxyHandler.handlePathPolicyAccess(matchedPolicy, w, r, sep) {
+		//Request blocked by path policy access rule
+		return
+	}
+
 	// Rate Limit
 	if sep.RequireRateLimit {
 		if err := router.handleRateLimit(w, r, sep); err != nil {
@@ -321,8 +330,7 @@ func (router *Router) handleNonTLSRequest(w http.ResponseWriter, r *http.Request
 	}
 
 	//Validate authentication using all configured auth methods (Basic, ForwardAuth, OAuth2, ZorxAuth)
-	proxyHandler := router.mux.(*ProxyHandler)
-	if handleAuthProviderRouting(sep, w, r, proxyHandler) {
+	if handleAuthProviderRouting(sep, w, r, proxyHandler, matchedPolicy) {
 		return
 	}
 

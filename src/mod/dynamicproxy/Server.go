@@ -78,6 +78,13 @@ func (h *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		//Per-path policy check (access rule half; auth half is enforced in the auth phase below)
+		matchedPolicy := sep.MatchPathPolicyRule(r)
+		if h.handlePathPolicyAccess(matchedPolicy, w, r, sep) {
+			//Request blocked by path policy access rule
+			return
+		}
+
 		/* Exploit Detection */
 		if sep.detector != nil {
 			if sep.detector.CheckIsAttack(w, r) {
@@ -127,7 +134,7 @@ func (h *ProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//Validate auth (basic auth or SSO auth)
-		respWritten := handleAuthProviderRouting(sep, w, r, h)
+		respWritten := handleAuthProviderRouting(sep, w, r, h, matchedPolicy)
 		if respWritten {
 			//Request handled by subroute
 			return

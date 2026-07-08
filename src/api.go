@@ -82,6 +82,12 @@ func RegisterHTTPProxyAPIs(authRouter *auth.RouterDef) {
 	authRouter.HandleFunc("/api/proxy/auth/zorxauth/exceptions/list", ListProxyZorxAuthExceptionRules)
 	authRouter.HandleFunc("/api/proxy/auth/zorxauth/exceptions/add", AddProxyZorxAuthExceptionRule)
 	authRouter.HandleFunc("/api/proxy/auth/zorxauth/exceptions/delete", RemoveProxyZorxAuthExceptionRule)
+	/* Per-path policy rules */
+	authRouter.HandleFunc("/api/proxy/pathpolicy/list", HandleListPathPolicyRules)
+	authRouter.HandleFunc("/api/proxy/pathpolicy/set", HandleSetPathPolicyRules)
+	/* Raw endpoint config editor */
+	authRouter.HandleFunc("/api/proxy/config/raw", HandleRawProxyConfig)
+	authRouter.HandleFunc("/api/proxy/config/reload", HandleReloadProxyConfigFromDisk)
 }
 
 // Register the APIs for TLS / SSL certificate management functions
@@ -110,6 +116,8 @@ func RegisterAuthenticationHandlerAPIs(authRouter *auth.RouterDef) {
 	authRouter.HandleFunc("/api/sso/OAuth2", oauth2Router.HandleSetOAuth2Settings)
 	authRouter.HandleFunc("/api/sso/zorxauth/provider", zorxAuthRouter.HandleAuthProviderSettings)
 	authRouter.HandleFunc("/api/sso/zorxauth/gateway", zorxAuthRouter.HandleGatewaySettings)
+	//Admin panel OIDC login settings (not to be confused with the proxied-site OAuth2 provider above)
+	authRouter.HandleFunc("/api/admin/oidc", adminOIDCRouter.HandleSettings)
 }
 
 // Register ZorxAuth user management APIs separately from generic SSO provider settings routes
@@ -306,6 +314,10 @@ func RegisterPluginAPIs(authRouter *auth.RouterDef) {
 func RegisterAuthAPIs(requireAuth bool, targetMux *http.ServeMux) {
 	targetMux.HandleFunc("/api/auth/login", authAgent.HandleLogin)
 	targetMux.HandleFunc("/api/auth/logout", authAgent.HandleLogout)
+	//Admin panel OIDC login. These must be reachable while unauthenticated
+	targetMux.HandleFunc("/api/auth/oidc/login", adminOIDCRouter.HandleLoginInitiate)
+	targetMux.HandleFunc("/api/auth/oidc/callback", adminOIDCRouter.HandleCallback)
+	targetMux.HandleFunc("/api/auth/oidc/status", adminOIDCRouter.HandleStatus)
 	targetMux.HandleFunc("/api/auth/checkLogin", func(w http.ResponseWriter, r *http.Request) {
 		if requireAuth {
 			authAgent.CheckLogin(w, r)

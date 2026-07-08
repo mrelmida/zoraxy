@@ -42,6 +42,63 @@
                     <i class="ui circle checkmark green icon "></i> Password Updated
                 </div>
             </div>
+            <div class="ui divider"></div>
+            <h3>Admin Panel SSO (OIDC)</h3>
+            <p>Log in to this Zoraxy admin panel with an external OpenID Connect identity provider (e.g. Authentik, Keycloak, Pocket ID). Password login always remains available as fallback.</p>
+            <div class="ui basic segment">
+                <div class="ui yellow message">
+                    <i class="info circle icon"></i>
+                    The identity returned by the IdP (see <b>Username Claim</b>) must match an existing Zoraxy admin username. This does not configure SSO for proxied sites — use the Authentication Providers section for that.
+                </div>
+                <form class="ui form" id="adminOidcForm" onsubmit="return false;">
+                    <div class="field">
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" id="adminOidcEnabled">
+                            <label>Enable OIDC login for the admin panel</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Well-Known / Discovery URL</label>
+                        <input type="text" id="adminOidcWellKnown" placeholder="https://idp.example.com/.well-known/openid-configuration">
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Client ID</label>
+                            <input type="text" id="adminOidcClientID" placeholder="zoraxy-admin">
+                        </div>
+                        <div class="field">
+                            <label>Client Secret</label>
+                            <input type="password" id="adminOidcClientSecret" placeholder="Client Secret">
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Scopes</label>
+                            <input type="text" id="adminOidcScopes" placeholder="openid profile email">
+                        </div>
+                        <div class="field">
+                            <label>Username Claim</label>
+                            <input type="text" id="adminOidcUsernameClaim" placeholder="preferred_username">
+                            <small>Userinfo claim matched against the local admin username. Falls back to <code>email</code>, then <code>sub</code>.</small>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Allowed Identities (optional)</label>
+                        <input type="text" id="adminOidcAllowedIdentities" placeholder="alice, bob@example.com">
+                        <small>Comma separated allowlist of claim values. Leave empty to allow any identity that matches a local admin account.</small>
+                    </div>
+                    <div class="field">
+                        <label>Redirect URL Override (optional)</label>
+                        <input type="text" id="adminOidcRedirectURL" placeholder="https://zoraxy.example.com/api/auth/oidc/callback">
+                        <small>Set this when the panel is accessed through an HTTPS reverse proxy. Must match the redirect URI registered at your IdP.</small>
+                    </div>
+                    <button class="ui basic button" onclick="saveAdminOidcSettings();"><i class="green save icon"></i> Save Settings</button>
+                    <button class="ui basic red button" onclick="resetAdminOidcSettings();"><i class="red eraser icon"></i> Reset</button>
+                    <div id="adminOidcSuccMsg" class="ui green message" style="display:none;">
+                        <i class="ui circle checkmark green icon"></i> Admin OIDC settings updated
+                    </div>
+                </form>
+            </div>
      </div>
     </div>
     <div class="ui bottom attached tab segment utilitiesTabs" data-tab="utiltab2">
@@ -312,6 +369,71 @@
     }
 
     loadLogSettings();
+
+    /*
+        Admin Panel SSO (OIDC)
+    */
+    function loadAdminOidcSettings() {
+        $.get("/api/admin/oidc", function(data) {
+            if (data.error != undefined) {
+                console.error("Failed to load admin OIDC settings:", data.error);
+                return;
+            }
+            $("#adminOidcEnabled").prop("checked", data.Enabled === true);
+            $("#adminOidcWellKnown").val(data.WellKnownURL || "");
+            $("#adminOidcClientID").val(data.ClientID || "");
+            $("#adminOidcClientSecret").val(data.ClientSecret || "");
+            $("#adminOidcScopes").val(data.Scopes || "openid profile email");
+            $("#adminOidcUsernameClaim").val(data.UsernameClaim || "preferred_username");
+            $("#adminOidcAllowedIdentities").val(data.AllowedIdentities || "");
+            $("#adminOidcRedirectURL").val(data.RedirectURL || "");
+            $('#adminOidcForm .ui.checkbox').checkbox();
+        });
+    }
+
+    function saveAdminOidcSettings() {
+        $.cjax({
+            type: "POST",
+            url: "/api/admin/oidc",
+            data: {
+                enabled: $("#adminOidcEnabled").is(":checked"),
+                wellKnownURL: $("#adminOidcWellKnown").val().trim(),
+                clientID: $("#adminOidcClientID").val().trim(),
+                clientSecret: $("#adminOidcClientSecret").val().trim(),
+                scopes: $("#adminOidcScopes").val().trim(),
+                usernameClaim: $("#adminOidcUsernameClaim").val().trim(),
+                allowedIdentities: $("#adminOidcAllowedIdentities").val().trim(),
+                redirectURL: $("#adminOidcRedirectURL").val().trim(),
+            },
+            success: function(data) {
+                if (data.error != undefined) {
+                    msgbox(data.error, false, 6000);
+                } else {
+                    $("#adminOidcSuccMsg").stop().finish().slideDown("fast").delay(3000).slideUp("fast");
+                }
+            }
+        });
+    }
+
+    function resetAdminOidcSettings() {
+        if (!confirm("Reset all admin OIDC settings and disable SSO login?")) {
+            return;
+        }
+        $.cjax({
+            type: "DELETE",
+            url: "/api/admin/oidc",
+            success: function(data) {
+                if (data.error != undefined) {
+                    msgbox(data.error, false, 6000);
+                } else {
+                    msgbox("Admin OIDC settings reset");
+                    loadAdminOidcSettings();
+                }
+            }
+        });
+    }
+
+    loadAdminOidcSettings();
 
     /*
         Geo-IP Lookup & Access Rule Check

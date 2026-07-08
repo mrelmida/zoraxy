@@ -804,6 +804,10 @@ func ReverseProxyHandleEditEndpoint(w http.ResponseWriter, r *http.Request) {
 		newProxyEndpoint.AuthenticationProvider.AuthMethod = dynamicproxy.AuthMethodNone
 	}
 
+	//Only enforce auth on paths whose path policy requires it
+	authScopePolicyPaths, _ := utils.PostBool(r, "authScopePolicyPaths")
+	newProxyEndpoint.AuthenticationProvider.AuthScopePolicyPaths = authScopePolicyPaths
+
 	disableAutoFallback, _ := utils.PostBool(r, "dAutoFallback")
 
 	newProxyEndpoint.RequireRateLimit = requireRateLimit

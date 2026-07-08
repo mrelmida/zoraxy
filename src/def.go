@@ -18,6 +18,7 @@ import (
 	"imuslab.com/zoraxy/mod/access"
 	"imuslab.com/zoraxy/mod/acme"
 	"imuslab.com/zoraxy/mod/auth"
+	"imuslab.com/zoraxy/mod/auth/oidc"
 	"imuslab.com/zoraxy/mod/auth/sso/forward"
 	"imuslab.com/zoraxy/mod/auth/sso/zorxauth"
 	"imuslab.com/zoraxy/mod/database"
@@ -32,13 +33,13 @@ import (
 	"imuslab.com/zoraxy/mod/netstat"
 	"imuslab.com/zoraxy/mod/pathrule"
 	"imuslab.com/zoraxy/mod/plugins"
+	"imuslab.com/zoraxy/mod/routedebug"
 	"imuslab.com/zoraxy/mod/sshprox"
 	"imuslab.com/zoraxy/mod/statistic"
 	"imuslab.com/zoraxy/mod/statistic/analytic"
 	"imuslab.com/zoraxy/mod/streamproxy"
 	"imuslab.com/zoraxy/mod/tlscert"
 	"imuslab.com/zoraxy/mod/uptime"
-	"imuslab.com/zoraxy/mod/routedebug"
 	"imuslab.com/zoraxy/mod/webserv"
 )
 
@@ -148,12 +149,13 @@ var (
 	/*
 		Handler Modules
 	*/
-	sysdb          *database.Database              //System database
-	authAgent      *auth.AuthAgent                 //Authentication agent
-	tlsCertManager *tlscert.Manager                //TLS / SSL management
-	redirectTable  *redirection.RuleTable          //Handle special redirection rule sets
-	webminPanelMux *http.ServeMux                  //Server mux for handling webmin panel APIs
-	csrfMiddleware func(http.Handler) http.Handler //CSRF protection middleware
+	sysdb           *database.Database              //System database
+	authAgent       *auth.AuthAgent                 //Authentication agent
+	adminOIDCRouter *oidc.AdminOIDCRouter           //OIDC single sign-on for the admin panel
+	tlsCertManager  *tlscert.Manager                //TLS / SSL management
+	redirectTable   *redirection.RuleTable          //Handle special redirection rule sets
+	webminPanelMux  *http.ServeMux                  //Server mux for handling webmin panel APIs
+	csrfMiddleware  func(http.Handler) http.Handler //CSRF protection middleware
 
 	pathRuleHandler    *pathrule.Handler         //Handle specific path blocking or custom headers
 	geodbStore         *geodb.Store              //GeoIP database, for resolving IP into country code

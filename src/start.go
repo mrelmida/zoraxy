@@ -18,6 +18,7 @@ import (
 	"imuslab.com/zoraxy/mod/access"
 	"imuslab.com/zoraxy/mod/acme"
 	"imuslab.com/zoraxy/mod/auth"
+	"imuslab.com/zoraxy/mod/auth/oidc"
 	"imuslab.com/zoraxy/mod/auth/sso/forward"
 	"imuslab.com/zoraxy/mod/auth/sso/zorxauth"
 	"imuslab.com/zoraxy/mod/database"
@@ -34,12 +35,12 @@ import (
 	"imuslab.com/zoraxy/mod/pathrule"
 	"imuslab.com/zoraxy/mod/plugins"
 	"imuslab.com/zoraxy/mod/plugins/zoraxy_plugin"
+	"imuslab.com/zoraxy/mod/routedebug"
 	"imuslab.com/zoraxy/mod/sshprox"
 	"imuslab.com/zoraxy/mod/statistic"
 	"imuslab.com/zoraxy/mod/statistic/analytic"
 	"imuslab.com/zoraxy/mod/streamproxy"
 	"imuslab.com/zoraxy/mod/tlscert"
-	"imuslab.com/zoraxy/mod/routedebug"
 	"imuslab.com/zoraxy/mod/webserv"
 )
 
@@ -129,6 +130,13 @@ func startupSequence() {
 	authAgent = auth.NewAuthenticationAgent(SYSTEM_NAME, []byte(sessionKey), sysdb, true, SystemWideLogger, func(w http.ResponseWriter, r *http.Request) {
 		//Not logged in. Redirecting to login page
 		http.Redirect(w, r, "/login.html", http.StatusTemporaryRedirect)
+	})
+
+	//Create the OIDC login router for the admin panel
+	adminOIDCRouter = oidc.NewAdminOIDCRouter(&oidc.Options{
+		Database:  sysdb,
+		Logger:    SystemWideLogger,
+		AuthAgent: authAgent,
 	})
 
 	// Create an API key manager for plugin authentication
